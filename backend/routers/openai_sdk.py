@@ -21,7 +21,7 @@ async def stream_openai_response(payload: dict):
     response = await client.chat.completions.create(**payload)
     async for line in response:
         if line:
-            data = line.model_dump()  # or use line.dict() if your object supports it
+            data = line.model_dump()
             yield f"data: {json.dumps(data)}\n\n"
             await asyncio.sleep(0.01)
 
@@ -29,7 +29,6 @@ async def stream_openai_response(payload: dict):
 async def proxy_openai_chat_completions(request: Request):
     payload = await request.json()
     is_stream = payload.get("stream", False)
-    
     if is_stream:
         return StreamingResponse(stream_openai_response(payload), media_type="text/event-stream")
     
